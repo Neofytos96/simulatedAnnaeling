@@ -10,8 +10,19 @@ def get_num_of_participants():
 
 get_num_of_participants()
 
+class results_class(object):
+    # driver_won = int
+    # weight = int
+    # driver_lost = int
 
-def get_participants_dict():
+    def __init__(self, weight, driver_won, driver_lost):
+        self.weight = weight
+        self.driver_won = driver_won
+        self.driver_lost = driver_lost
+
+results_list=[]
+
+def get_participants_details():
     participants_dict = {}
     for i in file_list:
         # to skip the first entry
@@ -23,14 +34,20 @@ def get_participants_dict():
             # print(driver_name)
             # print(driver_id)
             participants_dict[driver_id] = driver_name
+        # get the results for each driver
         elif file_list.index(i)>36:
-            print(i)
-    return (participants_dict)
+            x = re.split("\,", i)
+            weight_of_win = int(x[0])
+            driver_won = int(x[1])
+            driver_lost = int(x[2])
+            results_list.append(results_class(weight_of_win,driver_won,driver_lost))
+    return (participants_dict, results_list)
 
 
-get_participants_dict()
+get_participants_details()
 
-
+for i in results_list:
+    print(i.driver_lost)
 
 
 
