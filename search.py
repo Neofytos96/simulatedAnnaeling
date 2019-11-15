@@ -88,58 +88,46 @@ def swap(ranking):
     #             ranking[ranking.index(i.get_driver_lost())], ranking[ranking.index(i.get_driver_won())]
     num_a = random.randint(1, 35)
     num_b = random.randint(1, 35)
+    # num_c = random.randint(1, 10)
+    # num_d = random.randint(1, 10)
+    while num_a==num_b:
+        num_b = random.randint(1, 35)
+
     ranking[ranking.index(num_a)], ranking[ranking.index(num_b)]= ranking[ranking.index(num_b)],ranking[ranking.index(num_a)]
+    # ranking[ranking.index(num_c)], ranking[ranking.index(num_d)]= ranking[ranking.index(num_d)],ranking[ranking.index(num_c)]
+
     return ranking
-
-
-# for i in results_list:
-#     if (initial_ranking.index(i.get_driver_won()) > initial_ranking.index(i.get_driver_lost())):
-#             new_list = swap(initial_ranking.index(i.get_driver_won()),initial_ranking.index(i.get_driver_lost()), initial_ranking)
-#             if get_kemeny_ranking(initial_ranking)<get_kemeny_ranking(new_list):
-#                 initial_ranking=new_list
-
-    # print(get_kemeny_ranking(new_list))
-# print(get_kemeny_ranking())
 
 
 initial_temp = 100000000
 temp_length = 10000
+stopping_count=0
 for i in range(temp_length):
-    if i % 100 == 0:
+
+    if i % 1000 == 0:
         print(get_kemeny_ranking(participant_nums))
     previous_state = participant_nums
     previous_cost = get_kemeny_ranking(previous_state[:])
     next_state = swap(previous_state[:])
     next_cost = get_kemeny_ranking(next_state)
 
-
     if previous_cost > next_cost:
         participant_nums= next_state
+        min_cost = next_cost
+        stopping_count=0
 
     else:
         q = random.random()
-
+        stopping_count+=1
         if q < math.exp(-(next_cost- previous_cost)/initial_temp):
-            print("q: ",q)
-            print("e: ",math.exp(-(next_cost - previous_cost) / initial_temp))
             participant_nums = next_state
-    initial_temp = initial_temp * 0.9
-    print(previous_cost, next_cost)
+            min_cost = next_cost
+    initial_temp = initial_temp * 0.995
 
+    if stopping_count==10000:
+        break
 
-            # if (nextEnergy < minEnergy) {
-    # minState
-    # = (State) state.clone();
-    # minEnergy = nextEnergy;
-    # }
-    # }
-    # else
-    # state.undo();
-    # }
-    # return minState;
-# }
-
-
+print(min_cost)
 
 
 
