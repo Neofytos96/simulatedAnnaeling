@@ -99,7 +99,10 @@ def find_neighbourhood(ranking):
     random_result_object = (random.choice(results_list))
     num_a = random_result_object.get_driver_won()
     num_b = random_result_object.get_driver_lost()
-    swap(num_a, num_b, ranking)
+    if ranking.index(num_a)>ranking.index(num_b):
+        swap(num_a, num_b, ranking)
+    else:
+        find_neighbourhood(ranking)
 
     # num_a = random.randint(1,35)
     # num_b = random.randint(1, 35)
@@ -121,8 +124,8 @@ def find_neighbourhood(ranking):
 
 
 
-    if num_a!=num_b:
-        swap(num_a,num_b,ranking)
+    # if num_a!=num_b:
+    #     swap(num_a,num_b,ranking)
     return ranking
 
 
@@ -154,10 +157,10 @@ for i in range(temp_length):
         if q < math.exp(-(next_cost - previous_cost) / initial_temp):
             participant_nums = next_state
             min_cost = next_cost
-    initial_temp = initial_temp * 0.995
+    initial_temp = initial_temp * 0.996
 
     if stopping_count == 2000:
         print("stopping criterion")
         break
-
+print(participant_nums)
 print(min_cost)
