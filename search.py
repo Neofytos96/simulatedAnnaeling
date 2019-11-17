@@ -68,6 +68,8 @@ file.close()
 
 participant_nums = get_participants_details()[2]
 results_list = get_participants_details()[1]
+
+
 # print(results_list)
 
 # print(initial_ranking)
@@ -81,98 +83,81 @@ def get_kemeny_ranking(list):
             kemeny_score += i.get_weight()
     return (kemeny_score)
 
-from collections import defaultdict
 
-result_analytics = defaultdict(int)
-for i in results_list:
-    result_analytics[i.get_driver_won()] += i.get_weight()
-    import collections
+# from collections import defaultdict
+#
+# result_analytics = defaultdict(int)
+# for i in results_list:
+#     result_analytics[i.get_driver_won()] += i.get_weight()
+#     import collections
+#
+# sorted_list_on_analytics = sorted(result_analytics, key=result_analytics.get, reverse=True)
 
-sorted_list_on_analytics = sorted(result_analytics, key=result_analytics.get, reverse=True)
 
-def swap(ranking):
-    random_a_list = []
-    # print(ranking)
-    # for i in ranking:
-    #     if (i > .index(i.get_driver_lost())):
-    #         print(ranking.index(i.get_driver_won()), ranking.index(i.get_driver_lost()))
-    #         random_a_list.append(i)
+def find_neighbourhood(ranking):
 
-    #         ranking[ranking.index(i.get_driver_won())], ranking[ranking.index(i.get_driver_lost())]=\
-    #             ranking[ranking.index(i.get_driver_lost())], ranking[ranking.index(i.get_driver_won())]
-    # for i in sorted_list_on_analytics:
-    #     if ranking.index(i)>sorted_list_on_analytics.index(i):
-    #         random_a_list.append(i)
-            # print("in ranking: ", ranking.index(i), "in analytics: ", sorted_list_on_analytics.index(i))
-    # print(random_a_list)
-    # if random_a_list.__len__()>5:
-    #         num_a = random.choice(random_a_list)
+    random_result_object = (random.choice(results_list))
+    num_a = random_result_object.get_driver_won()
+    num_b = random_result_object.get_driver_lost()
+    swap(num_a, num_b, ranking)
+
+    # num_a = random.randint(1,35)
+    # num_b = random.randint(1, 35)
+    # num_c = random.randint(1,35)
+    # for i in results_list:
+    #     if i.get_driver_won()==num_a and i.get_driver_lost()== num_b:
+    #         swap(num_a, num_b, ranking)
+    #     elif i.get_driver_won()==num_a and i.get_driver_lost()== num_c:
+    #         swap(num_a,num_c,ranking)
+    #     elif i.get_driver_won()==num_b and i.get_driver_lost()== num_c:
+    #         swap(num_b,num_c,ranking)
     #
-    #         num_b = random.randint(1, 35)
-    #         print(num_a, num_b)
-    # else:
-    #     print("else passef")
-    num_a = random.randint(1, 35)
-    num_b= random.randint(1, 35)
-    for i in results_list:
-        # print(i)
-        if i.get_driver_won()==num_a and i.get_driver_lost()==num_b and i.get_weight()>0:
-            ranking[ranking.index(num_a)], ranking[ranking.index(num_b)] = ranking[ranking.index(num_b)], ranking[
-                ranking.index(num_a)]
+    #     elif i.get_driver_won()==num_b and i.get_driver_lost()== num_a:
+    #         swap(num_b,num_a,ranking)
+    #     elif i.get_driver_won()==num_c and i.get_driver_lost()== num_a:
+    #         swap(num_c,num_a,ranking)
+    #     elif i.get_driver_won()==num_c and i.get_driver_lost()== num_b:
+    #         swap(num_b,num_c,ranking)
 
-    # num_c = random.randint(1, 35)
-    # num_d = random.randint(1, 35)
-    # while num_a==num_b:
-    #     num_b = random.randint(1, 35)
 
-    # ranking[ranking.index(num_c)], ranking[ranking.index(num_d)]= ranking[ranking.index(num_d)],ranking[ranking.index(num_c)]
 
+    if num_a!=num_b:
+        swap(num_a,num_b,ranking)
     return ranking
 
 
+def swap(num_a, num_b, ranking):
+    ranking[ranking.index(num_a)], ranking[ranking.index(num_b)] = ranking[ranking.index(num_b)], ranking[
+        ranking.index(num_a)]
 
 
-
-initial_temp = 100000000
-temp_length = 100000
-stopping_count=0
+initial_temp = 100000000000
+temp_length = 10000
+stopping_count = 0
 for i in range(temp_length):
 
     if i % 1000 == 0:
         print(get_kemeny_ranking(participant_nums))
     previous_state = participant_nums
     previous_cost = get_kemeny_ranking(previous_state[:])
-    next_state = swap(previous_state[:])
+    next_state = find_neighbourhood(previous_state[:])
     next_cost = get_kemeny_ranking(next_state)
 
     if previous_cost > next_cost:
-        participant_nums= next_state
+        participant_nums = next_state
         min_cost = next_cost
-        stopping_count=0
+        stopping_count = 0
 
     else:
         q = random.random()
-        stopping_count+=1
-        if q < math.exp(-(next_cost- previous_cost)/initial_temp):
+        stopping_count += 1
+        if q < math.exp(-(next_cost - previous_cost) / initial_temp):
             participant_nums = next_state
             min_cost = next_cost
     initial_temp = initial_temp * 0.995
 
-    if stopping_count==2000:
+    if stopping_count == 2000:
         print("stopping criterion")
         break
 
 print(min_cost)
-
-
-
-
-
-
-
-
-
-
-
-
-
