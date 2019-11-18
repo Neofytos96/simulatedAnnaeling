@@ -75,6 +75,40 @@ def get_kemeny_ranking(list):
             kemeny_score += i.get_weight()
     return (kemeny_score)
 
+def increment_kemeny_ranking(previous_state, next_state):
+    kemeny_difference = 0
+    index_changes = [(i) for i in range(len(previous_state)) if previous_state[i] != next_state[i]]
+    influenced_drivers = []
+    for i in range(index_changes[0] + 1, index_changes[1]):
+        influenced_drivers.append(i)
+
+    index_changes = set(index_changes)
+    influenced_drivers = set(influenced_drivers)
+    for i in results_list:
+        if i.get_driver_won() in index_changes and i.get_driver_lost() in influenced_drivers:
+            if (next_state.index(i.get_driver_won()) > next_state.index(i.get_driver_lost())):
+                kemeny_difference += i.get_weight()
+            else:
+                kemeny_difference -= i.get_weight()
+        elif i.get_driver_lost() in index_changes and i.get_driver_won() in influenced_drivers:
+            if (next_state.index(i.get_driver_won()) > next_state.index(i.get_driver_lost())):
+                kemeny_difference += i.get_weight()
+            else:
+                kemeny_difference -= i.get_weight()
+
+        elif i.get_driver_won() in index_changes and i.get_driver_lost in index_changes:
+            if (next_state.index(i.get_driver_won()) > next_state.index(i.get_driver_lost())):
+                kemeny_difference += i.get_weight()
+            else:
+                kemeny_difference -= i.get_weight()
+        # else:
+            # print("driver won: ",i.get_driver_won())
+            # print("driver lost:", i.get_driver_lost())
+            # print(next_state)
+
+    return kemeny_difference
+
+
 
 def find_neighbourhood(ranking):
     random_result_object = (random.choice(results_list))
@@ -93,15 +127,17 @@ def swap(num_a, num_b, ranking):
 
 
 def simulated_annealing():
-    global participant_nums, min_cost, uphill_counter
+    global participant_nums, min_cost, uphill_counter, best_state
+    min_cost = get_kemeny_ranking(participant_nums)
     initial_temp = 1000#100000000000
     temp_length = 10000
     stopping_count = 0
     uphill_counter = 0
+    best_state = participant_nums
     for i in range(temp_length):
 
         if i % 1000 == 0:
-            print(get_kemeny_ranking(participant_nums))
+            print(min_cost)
         previous_state = participant_nums
         previous_cost = get_kemeny_ranking(previous_state[:])
         next_state = find_neighbourhood(previous_state[:])
@@ -109,19 +145,21 @@ def simulated_annealing():
 
         if previous_cost > next_cost:
             participant_nums = next_state
-            min_cost = next_cost
             stopping_count = 0
+            if next_cost< min_cost:
+                min_cost = next_cost
+                best_state = participant_nums[:]
 
         else:
             q = random.random()
             stopping_count += 1
             if q < math.exp(-(next_cost - previous_cost) / initial_temp):
                 participant_nums = next_state
-                min_cost = next_cost
+                # min_cost = next_cost
                 uphill_counter += 1
         initial_temp = initial_temp * 0.998 #0.996
 
-        if stopping_count == 2000:
+        if stopping_count == 1500:
             break
 
     return min_cost, participant_nums, uphill_counter
