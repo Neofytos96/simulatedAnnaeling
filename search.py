@@ -76,7 +76,8 @@ def get_kemeny_ranking(list):
     return (kemeny_score)
 
 
-def increment_kemeny_ranking(previous_state, next_state, kemeny_score):
+def increment_kemeny_ranking(previous_state, next_state):
+    kemeny_difference = 0
     index_changes = [(previous_state[i]) for i in range(len(previous_state)) if previous_state[i] != next_state[i]]
 
     influenced_drivers = []
@@ -93,34 +94,34 @@ def increment_kemeny_ranking(previous_state, next_state, kemeny_score):
     for i in results_list:
         if i.get_driver_won() in index_changes and i.get_driver_lost() in influenced_drivers:
             if (next_state.index(i.get_driver_won()) > next_state.index(i.get_driver_lost())):
-                kemeny_score += i.get_weight()
+                kemeny_difference += i.get_weight()
             else:
-                kemeny_score -= i.get_weight()
+                kemeny_difference -= i.get_weight()
 
         elif i.get_driver_lost() in index_changes and i.get_driver_won() in influenced_drivers:
             if (next_state.index(i.get_driver_won()) > next_state.index(i.get_driver_lost())):
-                kemeny_score += i.get_weight()
+                kemeny_difference += i.get_weight()
 
             else:
 
-                kemeny_score -= i.get_weight()
+                kemeny_difference -= i.get_weight()
 
         elif i.get_driver_won() in index_changes and i.get_driver_lost() in index_changes:
             # print("here")
             if (next_state.index(i.get_driver_won()) > next_state.index(i.get_driver_lost())):
-                kemeny_score += i.get_weight()
+                kemeny_difference += i.get_weight()
                 # print("Adding:", i.get_driver_won(), i.get_driver_lost())
 
             else:
                 # print("Subtracting:", i.get_driver_won(), i.get_driver_lost())
 
-                kemeny_score -= i.get_weight()
+                kemeny_difference -= i.get_weight()
                 # else:
                 # print("driver won: ",i.get_driver_won())
                 # print("driver lost:", i.get_driver_lost())
                 # print(next_state)
     # print(kemeny_difference)
-    return kemeny_score
+    return kemeny_difference
 
 
 def find_neighbourhood(ranking):
@@ -156,8 +157,8 @@ def simulated_annealing():
         previous_cost = get_kemeny_ranking(previous_state[:])
 
         next_state = find_neighbourhood(previous_state[:])
-        next_cost = increment_kemeny_ranking(previous_state, next_state, previous_cost)
-        # print("calculated:", increment_kemeny_ranking(previous_state, next_state, previous_cost))
+        next_cost = previous_cost + increment_kemeny_ranking(previous_state, next_state)
+        # print("calculated:", previous_cost + increment_kemeny_ranking(previous_state, next_state))
         # print("correct:", get_kemeny_ranking(next_state))
 
         if previous_cost > next_cost:
