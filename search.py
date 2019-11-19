@@ -5,7 +5,6 @@ import sys
 import time
 from texttable import Texttable
 
-
 # command to run the code: python3 search.py Formula_One_1984.wmg
 
 # file = open(str(sys.argv[1]))
@@ -61,6 +60,7 @@ def get_participants_details():
             results_list.append(results_class(weight_of_win, driver_won, driver_lost))
     return (participants_dict, results_list, initial_ranking)
 
+
 get_participants_details()
 file.close()
 participant_dict = get_participants_details()[0]
@@ -75,39 +75,52 @@ def get_kemeny_ranking(list):
             kemeny_score += i.get_weight()
     return (kemeny_score)
 
-def increment_kemeny_ranking(previous_state, next_state):
-    kemeny_difference = 0
-    index_changes = [(i) for i in range(len(previous_state)) if previous_state[i] != next_state[i]]
-    influenced_drivers = []
-    for i in range(index_changes[0] + 1, index_changes[1]):
-        influenced_drivers.append(i)
 
-    index_changes = set(index_changes)
-    influenced_drivers = set(influenced_drivers)
+def increment_kemeny_ranking(previous_state, next_state, kemeny_score):
+    index_changes = [(previous_state[i]) for i in range(len(previous_state)) if previous_state[i] != next_state[i]]
+
+    influenced_drivers = []
+    for i in range(previous_state.index(index_changes[0]), previous_state.index(index_changes[1]) - 1):
+        # print(previous_state[i+1])
+
+        influenced_drivers.append(previous_state[i + 1])
+    # print(previous_state)
+    # print(next_state)
+    # print("index drivers:", index_changes)
+    # print("influenced drivers:", influenced_drivers)
+    # index_changes = set(index_changes)
+
     for i in results_list:
         if i.get_driver_won() in index_changes and i.get_driver_lost() in influenced_drivers:
             if (next_state.index(i.get_driver_won()) > next_state.index(i.get_driver_lost())):
-                kemeny_difference += i.get_weight()
+                kemeny_score += i.get_weight()
             else:
-                kemeny_difference -= i.get_weight()
+                kemeny_score -= i.get_weight()
+
         elif i.get_driver_lost() in index_changes and i.get_driver_won() in influenced_drivers:
             if (next_state.index(i.get_driver_won()) > next_state.index(i.get_driver_lost())):
-                kemeny_difference += i.get_weight()
-            else:
-                kemeny_difference -= i.get_weight()
+                kemeny_score += i.get_weight()
 
-        elif i.get_driver_won() in index_changes and i.get_driver_lost in index_changes:
+            else:
+
+                kemeny_score -= i.get_weight()
+
+        elif i.get_driver_won() in index_changes and i.get_driver_lost() in index_changes:
+            # print("here")
             if (next_state.index(i.get_driver_won()) > next_state.index(i.get_driver_lost())):
-                kemeny_difference += i.get_weight()
+                kemeny_score += i.get_weight()
+                # print("Adding:", i.get_driver_won(), i.get_driver_lost())
+
             else:
-                kemeny_difference -= i.get_weight()
-        # else:
-            # print("driver won: ",i.get_driver_won())
-            # print("driver lost:", i.get_driver_lost())
-            # print(next_state)
+                # print("Subtracting:", i.get_driver_won(), i.get_driver_lost())
 
-    return kemeny_difference
-
+                kemeny_score -= i.get_weight()
+                # else:
+                # print("driver won: ",i.get_driver_won())
+                # print("driver lost:", i.get_driver_lost())
+                # print(next_state)
+    # print(kemeny_difference)
+    return kemeny_score
 
 
 def find_neighbourhood(ranking):
@@ -129,7 +142,7 @@ def swap(num_a, num_b, ranking):
 def simulated_annealing():
     global participant_nums, min_cost, uphill_counter, best_state
     min_cost = get_kemeny_ranking(participant_nums)
-    initial_temp = 1000#100000000000
+    initial_temp = 1000  # 100000000000
     temp_length = 10000
     stopping_count = 0
     uphill_counter = 0
@@ -138,17 +151,22 @@ def simulated_annealing():
 
         if i % 1000 == 0:
             print(min_cost)
+
         previous_state = participant_nums
         previous_cost = get_kemeny_ranking(previous_state[:])
+
         next_state = find_neighbourhood(previous_state[:])
-        next_cost = get_kemeny_ranking(next_state)
+        next_cost = increment_kemeny_ranking(previous_state, next_state, previous_cost)
+        # print("calculated:", increment_kemeny_ranking(previous_state, next_state, previous_cost))
+        # print("correct:", get_kemeny_ranking(next_state))
 
         if previous_cost > next_cost:
             participant_nums = next_state
-            stopping_count = 0
-            if next_cost< min_cost:
+            if next_cost < min_cost:
                 min_cost = next_cost
                 best_state = participant_nums[:]
+                stopping_count = 0
+
 
         else:
             q = random.random()
@@ -157,28 +175,27 @@ def simulated_annealing():
                 participant_nums = next_state
                 # min_cost = next_cost
                 uphill_counter += 1
-        initial_temp = initial_temp * 0.998 #0.996
+        initial_temp = initial_temp * 0.998  # 0.996
 
-        if stopping_count == 1500:
+        if stopping_count == 3000:
             break
 
     return min_cost, participant_nums, uphill_counter
 
+
 start_time = time.time()
 simulated_annealing()
 end_time = time.time()
-
 
 t = Texttable()
 t.add_rows([['Rank', 'Name']])
 # for rank in range(1,36):
 #     print(rank)
 rank_counter = 1
-for counter, drivers  in enumerate(participant_nums,1):
+for counter, drivers in enumerate(participant_nums, 1):
     t.add_row([[counter], participant_dict[drivers]])
 
 print(t.draw())
 print("Kemeny score of solution found: ", min_cost)
-print("Algorithm Runtime (in milliseconds):", round((end_time-start_time)*1000,2))
+print("Algorithm Runtime (in milliseconds):", round((end_time - start_time) * 1000, 2))
 print("Uphill moved made: ", uphill_counter)
-
