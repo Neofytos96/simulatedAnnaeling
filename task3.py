@@ -150,8 +150,8 @@ def simulated_annealing(initial_temperature, temperature_length, a, num_non_impr
     best_state = participant_nums
     for i in range(temp_length):
 
-        if i % 1000 == 0:
-            print(min_cost)
+        # if i % 1000 == 0:
+        #     print(min_cost)
 
         previous_state = participant_nums
         previous_cost = get_kemeny_ranking(previous_state[:])
@@ -184,19 +184,72 @@ def simulated_annealing(initial_temperature, temperature_length, a, num_non_impr
     return min_cost, participant_nums, uphill_counter
 
 
-start_time = time.time()
-simulated_annealing(1000,10000, 0.998,2000)
-end_time = time.time()
+# results = simulated_annealing(1000,10000, 0.998,2000)
 
-t = Texttable()
-t.add_rows([['Rank', 'Name']])
-# for rank in range(1,36):
-#     print(rank)
-rank_counter = 1
-for counter, drivers in enumerate(participant_nums, 1):
-    t.add_row([[counter], participant_dict[drivers]])
+# min_cost  = results[0]
 
-print(t.draw())
-print("Kemeny score of solution found: ", min_cost)
-print("Algorithm Runtime (in milliseconds):", round((end_time - start_time) * 1000, 2))
-print("Uphill moved made: ", uphill_counter)
+initial_temperature_list = []
+temperature_length_list = []
+a_list = []
+num_non_improve_list = []
+time_list = []
+kemeny_list = []
+
+temp_length_constant = 10000
+num_non_improve_constant = 2000
+index = 0
+with open("statistic2.csv", "w") as out_file:
+    for initial_temp in [100,1000,100000,1000000,10000000, 100000000]:
+        for a_value in range(900,999,10):
+            for temp_length in [100,1000,10000,100000]:
+                for num_non_improve in [1000,2000,3000]:
+                    cooling_multiple = a_value/1000
+
+                    start_time = time.time()
+                    results = simulated_annealing(initial_temp,temp_length,cooling_multiple,num_non_improve)
+                    end_time = time.time()
+                    time_taken = end_time - start_time
+
+                    # initial_temperature_list.append(initial_temp)
+                    # temperature_length_list.append(temp_length_constant)
+                    # a_list.append(cooling_multiple)
+                    # num_non_improve_list.append(num_non_improve_constant)
+                    # time_list.append(time_taken)
+                    # kemeny_list.append(results[0])
+                    out_string = "\r\n"
+                    out_string += str(initial_temp)
+                    out_string += "," + str(cooling_multiple)
+                    out_string += "," + str(temp_length)
+                    out_string += "," + str(num_non_improve)
+                    out_string += "," + str(time_taken)
+                    out_string += "," + str(results[0])
+                    out_file.write(out_string)
+                    print(index)
+                    index+=1
+
+    out_file.close()
+
+# initial_temperature_list.append(1000)
+# temperature_length_list.append(10000)
+# a_list.append(0.998)
+# num_non_improve_list.append(2000)
+# time_list.append(time_taken)
+# kemeny_list.append(min_cost)
+
+# with open("results.txt", "a+") as out_file:
+#
+#     for i in range(len(initial_temperature_list)):
+#             out_string = "\r\n"
+#             out_string+=str(initial_temperature_list[i])
+#             out_string+=","+ str(temperature_length_list[i])
+#             out_string+=","+ str(a_list[i])
+#             out_string+=","+ str(num_non_improve_list[i])
+#             out_string+=","+ str(time_list[i])
+#             out_string+=","+ str(kemeny_list[i])
+#             out_file.write(out_string)
+
+
+
+
+
+
