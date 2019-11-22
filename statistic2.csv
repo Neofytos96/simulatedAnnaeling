@@ -1,4 +1,4 @@
-
+initial_temp,cooling_multiple,temp_length,num_non_improve,time_taken,kemeny_score
 100,0.9,100,1000,0.10590791702270508,111
 100,0.9,100,2000,0.1067042350769043,92
 100,0.9,100,3000,0.10582923889160156,92
