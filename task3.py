@@ -198,7 +198,7 @@ kemeny_list = []
 temp_length_constant = 10000
 num_non_improve_constant = 2000
 index = 0
-with open("statistic2.csv", "w") as out_file:
+with open("statistic2.csv", "a") as out_file:
     for initial_temp in [100,1000,100000,1000000,10000000, 100000000]:
         for a_value in range(900,999,10):
             for temp_length in [100,1000,10000,100000]:
@@ -210,12 +210,6 @@ with open("statistic2.csv", "w") as out_file:
                     end_time = time.time()
                     time_taken = end_time - start_time
 
-                    # initial_temperature_list.append(initial_temp)
-                    # temperature_length_list.append(temp_length_constant)
-                    # a_list.append(cooling_multiple)
-                    # num_non_improve_list.append(num_non_improve_constant)
-                    # time_list.append(time_taken)
-                    # kemeny_list.append(results[0])
                     out_string = "\r\n"
                     out_string += str(initial_temp)
                     out_string += "," + str(cooling_multiple)
@@ -228,26 +222,6 @@ with open("statistic2.csv", "w") as out_file:
                     index+=1
 
     out_file.close()
-
-# initial_temperature_list.append(1000)
-# temperature_length_list.append(10000)
-# a_list.append(0.998)
-# num_non_improve_list.append(2000)
-# time_list.append(time_taken)
-# kemeny_list.append(min_cost)
-
-# with open("results.txt", "a+") as out_file:
-#
-#     for i in range(len(initial_temperature_list)):
-#             out_string = "\r\n"
-#             out_string+=str(initial_temperature_list[i])
-#             out_string+=","+ str(temperature_length_list[i])
-#             out_string+=","+ str(a_list[i])
-#             out_string+=","+ str(num_non_improve_list[i])
-#             out_string+=","+ str(time_list[i])
-#             out_string+=","+ str(kemeny_list[i])
-#             out_file.write(out_string)
-
 
 
 

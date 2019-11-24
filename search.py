@@ -185,7 +185,7 @@ def simulated_annealing(initial_temperature, temperature_length, a, num_non_impr
 
 
 start_time = time.time()
-simulated_annealing(1000,10000, 0.998,2000)
+simulated_annealing(100,10000,0.994, 2000)
 end_time = time.time()
 
 t = Texttable()
