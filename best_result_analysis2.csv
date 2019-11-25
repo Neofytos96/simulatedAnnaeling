@@ -1,4 +1,4 @@
-initial_temp, cooling_multiple, temp_length, num_non_improve, kemeny_score
+initial_temp,cooling_multiple,temp_length,num_non_improve,kemeny_score
 100,0.993,1000,3000,66.8
 100,0.995,1000,2000,67.9
 100,0.995,10000,3000,66.3

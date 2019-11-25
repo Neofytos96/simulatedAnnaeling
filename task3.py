@@ -3,7 +3,11 @@ import random
 import math
 import sys
 import time
+
+import pandas as pd
 from texttable import Texttable
+import csv
+
 
 # command to run the code: python3 search.py Formula_One_1984.wmg
 
@@ -234,43 +238,55 @@ def generate_data():
 
 # generate_data()
 
-import csv
 
-with open('bestCases.csv') as csv_file:
-    csv_reader = csv.reader(csv_file, delimiter=',')
-    line_count = 0
+def generate_best_cases_results():
+    global line_count, row
+    with open('bestCases.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        line_count = 0
 
-# with open("best_result_analysis.csv", "w") as out_file:
+        # with open("best_result_analysis.csv", "w") as out_file:
 
-    for row in csv_reader:
-        if line_count == 0:
-            print(f'Column names are {", ".join(row)}')
-            line_count += 1
-        else:
-            kemeny_result_list = []
-            for_loop_counter = 0
-            for i in range (10):
-                for_loop_counter+=1
-                initial_temp = int(row[1])
-                cooling_multiple = float(row[2])
-                temp_length = int(row[3])
-                num_non_improve = int(row[4])
+        for row in csv_reader:
+            if line_count == 0:
+                print(f'Column names are {", ".join(row)}')
+                line_count += 1
+            else:
+                kemeny_result_list = []
+                for_loop_counter = 0
+                for i in range(10):
+                    for_loop_counter += 1
+                    initial_temp = int(row[1])
+                    cooling_multiple = float(row[2])
+                    temp_length = int(row[3])
+                    num_non_improve = int(row[4])
 
-                result = simulated_annealing(initial_temp, temp_length, cooling_multiple, num_non_improve)
-                kemeny_result_list.append(result[0])
-                if for_loop_counter ==10:
-                    with open("best_result_analysis2.csv", "a") as out_file:
+                    result = simulated_annealing(initial_temp, temp_length, cooling_multiple, num_non_improve)
+                    kemeny_result_list.append(result[0])
+                    if for_loop_counter == 10:
+                        with open("best_result_analysis2.csv", "a") as out_file:
+                            out_string = "\r\n"
+                            out_string += str(initial_temp)
+                            out_string += "," + str(cooling_multiple)
+                            out_string += "," + str(temp_length)
+                            out_string += "," + str(num_non_improve)
+                            # out_string += "," + str(sum(time_results) / len(time_results))
+                            out_string += "," + str(sum(kemeny_result_list) / len(kemeny_result_list))
+                            out_file.write(out_string)
+                            out_file.close()
+                print(f'\t{row[1]} ,{row[2]} ,{row[3]}, {row[4]}.')
+                line_count += 1
+        print(f'Processed {line_count} lines.')
 
-                        out_string = "\r\n"
-                        out_string += str(initial_temp)
-                        out_string += "," + str(cooling_multiple)
-                        out_string += "," + str(temp_length)
-                        out_string += "," + str(num_non_improve)
-                        # out_string += "," + str(sum(time_results) / len(time_results))
-                        out_string += "," + str(sum(kemeny_result_list) / len(kemeny_result_list))
-                        out_file.write(out_string)
-                        out_file.close()
-            print(f'\t{row[1]} ,{row[2]} ,{row[3]}, {row[4]}.')
-            line_count += 1
-    print(f'Processed {line_count} lines.')
 
+# generate_best_cases_results()
+
+def print_best_variables():
+    best_data = pd.read_csv('best_result_analysis2.csv')
+    best_data = best_data.dropna()
+    filtering = (best_data.kemeny_score < 65)
+    filtered_data = best_data[filtering]
+    print(filtered_data)
+
+
+# print_best_variables()
