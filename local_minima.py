@@ -186,7 +186,7 @@ def simulated_annealing(initial_temperature, temperature_length, a, num_non_impr
 
 
 start_time = time.time()
-simulated_annealing(1000, 10000, 0.998, 2000)
+simulated_annealing(1000,10000,0.996,3000)
 end_time = time.time()
 
 t = Texttable()
@@ -207,4 +207,7 @@ import matplotlib.pyplot as plt
 fig = plt.figure('')
 ax = fig.add_subplot(1,1,1)
 ax.plot(current_scores, "r-")
+plt.xlabel("Iterations")
+plt.ylabel("Kemeny Score")
+
 plt.show()
