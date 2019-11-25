@@ -141,22 +141,22 @@ def swap(num_a, num_b, ranking):
 
 
 def simulated_annealing(initial_temperature, temperature_length, a, num_non_improve):
-
-    global participant_nums, min_cost, uphill_counter, best_state
+    global participant_nums, min_cost, uphill_counter, best_state, current_scores
+    current_scores = []
     min_cost = get_kemeny_ranking(participant_nums)
     initial_temp = initial_temperature  # 100000000000
-    temp_length = temperature_length#10000
+    temp_length = temperature_length  # 10000
     stopping_count = 0
     uphill_counter = 0
     best_state = participant_nums
     for i in range(temp_length):
 
-        if i % 1000 == 0:
-            print(min_cost)
+        # if i % 1000 == 0:
+        #     print(min_cost)
 
         previous_state = participant_nums
         previous_cost = get_kemeny_ranking(previous_state[:])
-
+        current_scores.append(previous_cost)
         next_state = find_neighbourhood(previous_state[:])
         next_cost = previous_cost + increment_kemeny_ranking(previous_state, next_state)
         # print("calculated:", previous_cost + increment_kemeny_ranking(previous_state, next_state))
@@ -177,16 +177,15 @@ def simulated_annealing(initial_temperature, temperature_length, a, num_non_impr
                 participant_nums = next_state
                 # min_cost = next_cost
                 uphill_counter += 1
-        initial_temp = initial_temp * a#0.998  # 0.996
+        initial_temp = initial_temp * a  # 0.998  # 0.996
 
-        if stopping_count == num_non_improve: #3000:
+        if stopping_count == num_non_improve:  # 3000:
             break
 
     return min_cost, participant_nums, uphill_counter
 
 
 start_time = time.time()
-#parameters: initial_temperature, temperature_length, a, num_non_improve
 simulated_annealing(1000, 10000, 0.998, 2000)
 end_time = time.time()
 
@@ -202,3 +201,10 @@ print(t.draw())
 print("Kemeny score of solution found: ", min_cost)
 print("Algorithm Runtime (in milliseconds):", round((end_time - start_time) * 1000, 2))
 print("Uphill moved made: ", uphill_counter)
+
+import matplotlib.pyplot as plt
+
+fig = plt.figure('')
+ax = fig.add_subplot(1,1,1)
+ax.plot(current_scores, "r-")
+plt.show()

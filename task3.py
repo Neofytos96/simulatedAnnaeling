@@ -144,7 +144,7 @@ def simulated_annealing(initial_temperature, temperature_length, a, num_non_impr
     global participant_nums, min_cost, uphill_counter, best_state
     min_cost = get_kemeny_ranking(participant_nums)
     initial_temp = initial_temperature  # 100000000000
-    temp_length = temperature_length#10000
+    temp_length = temperature_length  # 10000
     stopping_count = 0
     uphill_counter = 0
     best_state = participant_nums
@@ -176,9 +176,9 @@ def simulated_annealing(initial_temperature, temperature_length, a, num_non_impr
                 participant_nums = next_state
                 # min_cost = next_cost
                 uphill_counter += 1
-        initial_temp = initial_temp * a#0.998  # 0.996
+        initial_temp = initial_temp * a  # 0.998  # 0.996
 
-        if stopping_count == num_non_improve: #3000:
+        if stopping_count == num_non_improve:  # 3000:
             break
 
     return min_cost, participant_nums, uphill_counter
@@ -198,32 +198,35 @@ kemeny_list = []
 temp_length_constant = 10000
 num_non_improve_constant = 2000
 index = 0
-with open("statistic2.csv", "a") as out_file:
-    for initial_temp in [100,1000,100000,1000000,10000000, 100000000]:
-        for a_value in range(900,999,10):
-            for temp_length in [100,1000,10000,100000]:
-                for num_non_improve in [1000,2000,3000]:
-                    cooling_multiple = a_value/1000
-
-                    start_time = time.time()
-                    results = simulated_annealing(initial_temp,temp_length,cooling_multiple,num_non_improve)
-                    end_time = time.time()
-                    time_taken = end_time - start_time
+with open("statistic4.csv", "w") as out_file:
+    # for i in range(3):
+    for initial_temp in [100, 1000, 100000, 1000000, 10000000, 100000000]:
+        for a_value in range(990, 999):
+            for temp_length in [100, 1000, 10000, 100000]:
+                for num_non_improve in [1000, 2000, 3000]:
+                    cooling_multiple = a_value / 1000
+                    for i in range(3):
+                        kemeny_list_results = []
+                        time_results = []
+                        start_time = time.time()
+                        results = simulated_annealing(initial_temp,
+                                                      temp_length,
+                                                      cooling_multiple,
+                                                      num_non_improve)
+                        end_time = time.time()
+                        time_taken = end_time - start_time
+                        kemeny_list_results.append(results[0])
+                        time_results.append(time_taken)
 
                     out_string = "\r\n"
                     out_string += str(initial_temp)
                     out_string += "," + str(cooling_multiple)
                     out_string += "," + str(temp_length)
                     out_string += "," + str(num_non_improve)
-                    out_string += "," + str(time_taken)
-                    out_string += "," + str(results[0])
+                    out_string += "," + str(sum(time_results) / len(time_results))
+                    out_string += "," + str(sum(kemeny_list_results) / len(kemeny_list_results))
                     out_file.write(out_string)
                     print(index)
-                    index+=1
+                    index += 1
 
     out_file.close()
-
-
-
-
-
